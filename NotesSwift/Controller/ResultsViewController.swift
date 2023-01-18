@@ -15,12 +15,14 @@ class ResultsViewController: UIViewController {
     
     @IBOutlet weak var listTableViewSearchBar: UISearchBar!
     
+    private let catagoryManger = CatagoryManager()
+    
     
     var listOfPeople = [ItemModel]()
-   var selectedCatagory:Catagory? {
+    var selectedCatagory:CatagoryModel? {
         
         didSet{
-        
+            
             fetchRequest()
         }
         
@@ -34,8 +36,8 @@ class ResultsViewController: UIViewController {
         listTableView.delegate = self
         listTableViewSearchBar.delegate = self
         listTableView.register(UINib(nibName: "ListTableViewCell", bundle: nil), forCellReuseIdentifier: "listTableViewCell")
-                let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-                print(filePath)
+        let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        print(filePath)
     }
     
     
@@ -44,11 +46,11 @@ class ResultsViewController: UIViewController {
         addAlert()
     }
     
-
+    
 }
 
 
-// MARK: - Table View Data Source
+//MARK: - Table View Data Source
 
 extension ResultsViewController:UITableViewDataSource{
     
@@ -61,16 +63,16 @@ extension ResultsViewController:UITableViewDataSource{
         let cell = tableView.dequeueReusableCell(withIdentifier: "listTableViewCell", for: indexPath) as! ListTableViewCell
         
         let indexOfList = listOfPeople[indexPath.row]
-        cell.nameLabel.text = indexOfList.itemTitle
-        cell.accessoryType =  indexOfList.itemStatus ? .checkmark : .none
-
+        cell.nameLabel.text = indexOfList.ItemName
+        //  cell.accessoryType =  indexOfList.ItemStatus ? .checkmark : .none
+        
         return cell
     }
     
     
 }
 
-  // MARK: - TableView Delegate
+// MARK: - TableView Delegate
 
 extension ResultsViewController:UITableViewDelegate{
     
@@ -79,14 +81,14 @@ extension ResultsViewController:UITableViewDelegate{
         return 40
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-        listOfPeople[indexPath.row].itemStatus = !listOfPeople[indexPath.row].itemStatus
-        PresesTanceStorage.shared.saveContext()
-        self.listTableView.reloadData()
-        self.listTableView.deselectRow(at: indexPath, animated: true)
-        
-    }
+    //    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    //
+    //        listOfPeople[indexPath.row].itemStatus = !listOfPeople[indexPath.row].itemStatus
+    //        PresesTanceStorage.shared.saveContext()
+    //        self.listTableView.reloadData()
+    //        self.listTableView.deselectRow(at: indexPath, animated: true)
+    //
+    //    }
     
 }
 
@@ -95,15 +97,26 @@ extension ResultsViewController:UITableViewDelegate{
 extension ResultsViewController:UISearchBarDelegate{
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-    
-        if listTableViewSearchBar.text != "" {
         
-            let searchText = listTableViewSearchBar.text!
-            let request:NSFetchRequest<ItemModel> = ItemModel.fetchRequest()
-            let predicate = NSPredicate(format: "itemTitle CONTAINS[cd] %@", searchText)
-            let sortDescrpt = NSSortDescriptor(key: "itemTitle", ascending: true)
-            request.sortDescriptors = [sortDescrpt]
-            fetchRequest(with: request, predicate: predicate)
+        if listTableViewSearchBar.text != "" {
+            
+            if listOfPeople.count != 0{
+                
+                var newItemList = [ItemModel]()
+                
+                listOfPeople.forEach { itemModel in
+                    
+                    if itemModel.ItemName.uppercased().contains(listTableViewSearchBar.text!.uppercased()){
+                        
+                        newItemList.append(itemModel)
+                    }
+                    
+                }
+                
+                listOfPeople = newItemList
+                self.listTableView.reloadData()
+                
+            }
             
         }
         
@@ -118,19 +131,13 @@ extension ResultsViewController:UISearchBarDelegate{
             DispatchQueue.main.async {
                 searchBar.resignFirstResponder()
             }
-           
-           
+            
+            
         }
+        
     }
     
 }
-
-
-
-
-
-
-
 
 // MARK: - Alert Controller
 
@@ -143,15 +150,21 @@ extension ResultsViewController{
             
             if self.addTextField.text != "" {
                 
-                let newItem = ItemModel(context: PresesTanceStorage.shared.context)
-                newItem.itemTitle = self.addTextField.text!
-                newItem.itemStatus = false
-                newItem.parentCatagory = self.selectedCatagory!
-                PresesTanceStorage.shared.saveContext()
-                self.listOfPeople.append(newItem)
-                self.listTableView.reloadData()
-                
+                if let catagoryData = self.selectedCatagory{
+                    
+                    let itemData = ItemModel(ItemName: self.addTextField.text!, ItemID: UUID(), ItemStatus: false)
+                    
+                    let newCatagoryData = CatagoryModel(catagoryID: catagoryData.catagoryID, catagoryTitle: catagoryData.catagoryTitle,catagorysItem: itemData)
+                    
+                    self.catagoryManger.createCatagoryDatawithItem(record: newCatagoryData)
+                    self.listOfPeople.append(itemData)
+                    self.listTableView.reloadData()
+                    
+                    
+                    
+                }
             }
+            
         }
         
         alert.addTextField {(textfield) in
@@ -173,29 +186,22 @@ extension ResultsViewController{
 
 extension ResultsViewController{
     
-    
-    func fetchRequest(with request:NSFetchRequest<ItemModel> = ItemModel.fetchRequest(),predicate:NSPredicate? = nil){
+    func fetchRequest(){
         
-        let catagoryPrdicate = NSPredicate(format: "parentCatagory.catagoryName MATCHES %@", selectedCatagory!.catagoryName!)
-        
-        if let additionalPredicate = predicate{
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [catagoryPrdicate,additionalPredicate])
-        }else{
-            request.predicate = catagoryPrdicate
-        }
-        
-        do{
+        if let catagoryData = selectedCatagory{
             
-            let fetchData = try PresesTanceStorage.shared.context.fetch(request)
-            self.listOfPeople = fetchData
+            let itemData = catagoryManger.fetchItemData(title: catagoryData.catagoryTitle)
+            if let safeData = itemData{
+                listOfPeople = safeData
+                DispatchQueue.main.async {
+                    self.listTableView.reloadData()
+                    
+                }
+            }
             
-        }catch{
-            print(error)
+       
         }
         
-        DispatchQueue.main.async {
-            self.listTableView.reloadData()
-        }
         
     }
     
