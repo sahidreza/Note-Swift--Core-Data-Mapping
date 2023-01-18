@@ -14,14 +14,15 @@ class CatagoryTableViewController: UITableViewController {
     
     @IBOutlet var catagoryTableview: UITableView!
     
-    var catagoryList = [Catagory]()
+    var catagoryList = [CatagoryModel]()
     var catagoryTextField = UITextField()
+    let catagoryManager = CatagoryManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //        let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        //        print(filePath)
+        let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        print(filePath)
         loadItem()
         
     }
@@ -48,7 +49,7 @@ extension CatagoryTableViewController{
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "CatagoryCell", for: indexPath)
         
-        cell.textLabel?.text = catagoryList[indexPath.row].catagoryName
+        cell.textLabel?.text = catagoryList[indexPath.row].catagoryTitle
         
         return cell
     }
@@ -86,9 +87,8 @@ extension CatagoryTableViewController{
             
             if self.catagoryTextField.text != " "{
                 
-                let newCatagory = Catagory(context: PresesTanceStorage.shared.context)
-                newCatagory.catagoryName = self.catagoryTextField.text!
-                PresesTanceStorage.shared.saveContext()
+                let newCatagory = CatagoryModel(catagoryID: UUID(), catagoryTitle: self.catagoryTextField.text!)
+                self.catagoryManager.createCatagoryData(with: newCatagory)
                 self.catagoryList.append(newCatagory)
                 self.catagoryTableview.reloadData()
                 
@@ -113,23 +113,22 @@ extension CatagoryTableViewController{
 
 extension CatagoryTableViewController{
     
-    func loadItem(request:NSFetchRequest<Catagory> = Catagory.fetchRequest()){
+    func loadItem(){
         
-        do{
+        let catagoryData = catagoryManager.fetchCatagoryData()
+        
+        if let safeData = catagoryData {
             
-            let responseData = try PresesTanceStorage.shared.context.fetch(request)
-            self.catagoryList = responseData
+            self.catagoryList = safeData
             
             DispatchQueue.main.async {
                 
                 self.catagoryTableview.reloadData()
             }
             
-        }catch{
-            print(error)
         }
         
-        
+       
     }
     
     
