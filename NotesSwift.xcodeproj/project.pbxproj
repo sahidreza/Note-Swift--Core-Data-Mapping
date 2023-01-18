@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		D108EDF1297126E900C8AF32 /* CatagoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D108EDF0297126E900C8AF32 /* CatagoryTableViewController.swift */; };
-		D10F424629781D76000F54A2 /* readme.md in Resources */ = {isa = PBXBuildFile; fileRef = D10F424529781D76000F54A2 /* readme.md */; };
 		D18209222975A4C30029FDA9 /* CatagoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D18209212975A4C30029FDA9 /* CatagoryModel.swift */; };
 		D18209252975A55E0029FDA9 /* BaseReposetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = D18209242975A55E0029FDA9 /* BaseReposetry.swift */; };
 		D18209292975A7590029FDA9 /* CatagoryReposetryData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D18209282975A7590029FDA9 /* CatagoryReposetryData.swift */; };
@@ -32,7 +31,6 @@
 
 /* Begin PBXFileReference section */
 		D108EDF0297126E900C8AF32 /* CatagoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatagoryTableViewController.swift; sourceTree = "<group>"; };
-		D10F424529781D76000F54A2 /* readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
 		D18209172975A34C0029FDA9 /* NotesSwift 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "NotesSwift 2.xcdatamodel"; sourceTree = "<group>"; };
 		D18209212975A4C30029FDA9 /* CatagoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatagoryModel.swift; sourceTree = "<group>"; };
 		D18209242975A55E0029FDA9 /* BaseReposetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseReposetry.swift; sourceTree = "<group>"; };
@@ -133,7 +131,6 @@
 		D1F83C18296FCD1D00B7DC99 /* NotesSwift */ = {
 			isa = PBXGroup;
 			children = (
-				D10F424529781D76000F54A2 /* readme.md */,
 				D1F83C19296FCD1D00B7DC99 /* AppDelegate.swift */,
 				D1F83C1B296FCD1D00B7DC99 /* SceneDelegate.swift */,
 				D18209232975A5370029FDA9 /* Reposetry */,
@@ -231,7 +228,6 @@
 				D1F83C29296FCD2000B7DC99 /* LaunchScreen.storyboard in Resources */,
 				D1F83C34296FCEF000B7DC99 /* ListTableViewCell.xib in Resources */,
 				D1F83C26296FCD2000B7DC99 /* Assets.xcassets in Resources */,
-				D10F424629781D76000F54A2 /* readme.md in Resources */,
 				D1F83C21296FCD1D00B7DC99 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
